@@ -34,9 +34,9 @@ application/json
 
 ```json
 {
-  "fullname": {
-    "firstname": "string",
-    "lastname": "string"
+  "fullName": {
+    "firstName": "string",
+    "lastName": "string"
   },
   "email": "string",
   "password": "string"
@@ -47,8 +47,8 @@ application/json
 
 | Field                | Type   | Required | Validation                         |
 | -------------------- | ------ | -------- | ---------------------------------- |
-| `fullname.firstname` | String | Yes      | Minimum 3 characters               |
-| `fullname.lastname`  | String | No       | Minimum 3 characters (if provided) |
+| `fullName.firstName` | String | Yes      | Minimum 3 characters               |
+| `fullName.lastName`  | String | No       | Minimum 3 characters (if provided) |
 | `email`              | String | Yes      | Valid email format                 |
 | `password`           | String | Yes      | Minimum 6 characters               |
 
@@ -96,7 +96,7 @@ application/json
     {
       "value": "ab",
       "msg": "First Name Should be 3 character",
-      "param": "fullname.firstname",
+      "param": "fullName.firstName",
       "location": "body"
     },
     {
@@ -126,8 +126,8 @@ curl -X POST http://localhost:4000/users/registration \
   -H "Content-Type: application/json" \
   -d '{
     "fullname": {
-      "firstname": "John",
-      "lastname": "Doe"
+      "firstName": "John",
+      "lastName": "Doe"
     },
     "email": "john@example.com",
     "password": "password123"
@@ -144,9 +144,162 @@ const response = await fetch("http://localhost:4000/users/registration", {
   },
   body: JSON.stringify({
     fullname: {
-      firstname: "John",
-      lastname: "Doe",
+      firstName: "John",
+      lastName: "Doe",
     },
+    email: "john@example.com",
+    password: "password123",
+  }),
+});
+
+---
+
+## User Login Endpoint
+
+### Endpoint Details
+
+**Route:** `POST /users/login`
+
+**Description:** This endpoint allows existing users to authenticate and log into the Uber application. It validates the user's email and password, and returns an authentication token upon successful login.
+
+---
+
+## Request
+
+### Method
+```
+
+POST
+
+```
+
+### URL
+```
+
+/users/login
+
+```
+
+### Content-Type
+```
+
+application/json
+
+````
+
+### Request Body
+
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+````
+
+### Request Parameters
+
+| Field      | Type   | Required | Validation           |
+| ---------- | ------ | -------- | -------------------- |
+| `email`    | String | Yes      | Valid email format   |
+| `password` | String | Yes      | Minimum 6 characters |
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "token": "JWT_TOKEN_HERE",
+  "user": {
+    "_id": "user_id",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john@example.com"
+  }
+}
+```
+
+### Error Responses
+
+#### 1. Validation Error
+
+**Status Code:** `400 Bad Request`
+
+**Response Body:**
+
+```json
+{
+  "errors": [
+    {
+      "value": "invalid-email",
+      "msg": "Invalid Email",
+      "param": "email",
+      "location": "body"
+    },
+    {
+      "value": "12345",
+      "msg": "Password length should be 6 character long",
+      "param": "password",
+      "location": "body"
+    }
+  ]
+}
+```
+
+**Possible Validation Errors:**
+
+- Invalid Email format
+- Password less than 6 characters
+
+#### 2. Authentication Error
+
+**Status Code:** `401 Unauthorized`
+
+**Response Body:**
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+**Possible Authentication Errors:**
+
+- User with provided email does not exist
+- Password does not match the stored hashed password
+
+---
+
+## Example Usage
+
+### cURL
+
+```bash
+curl -X POST http://localhost:4000/users/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+```
+
+### JavaScript (Fetch API)
+
+```javascript
+const response = await fetch("http://localhost:4000/users/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
     email: "john@example.com",
     password: "password123",
   }),

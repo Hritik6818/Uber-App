@@ -154,7 +154,7 @@ const response = await fetch("http://localhost:4000/users/registration", {
 
 ---
 
-## User Login Endpoint
+## User Login Endpointī
 
 ### Endpoint Details
 
@@ -317,3 +317,135 @@ console.log(data);
 - A JWT token is generated upon successful registration using the JWT_SECRET from environment variables
 - The email field must be unique in the database
 - Passwords are never returned in the response
+
+---
+
+## User Profile Endpoint
+
+### Endpoint Details
+
+**Route:** `GET /users/profile`
+
+**Description:** Returns the authenticated user's profile data. Requires a valid JWT token in `Authorization` header (`Bearer <token>`) or cookie `token`.
+
+---
+
+## Request
+
+### Method
+
+```
+GET
+```
+
+### URL
+
+```
+/users/profile
+```
+
+### Headers
+
+- `Authorization: Bearer <JWT_TOKEN>` (optional if cookie is used)
+- `Cookie: token=<JWT_TOKEN>` (optional if Authorization header is used)
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "user": {
+    "_id": "user_id",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john@example.com"
+  }
+}
+```
+
+### Error Response
+
+**Status Code:** `401 Unauthorized`
+
+**Response Body:**
+
+```json
+{
+  "message": "Access denied. No token provided."
+}
+```
+
+or
+
+```json
+{
+  "message": "Invalid token."
+}
+```
+
+---
+
+## User Logout Endpoint
+
+### Endpoint Details
+
+**Route:** `GET /users/logout`
+
+**Description:** Logs out the authenticated user by clearing the `token` cookie and storing the token in a blacklist for 24 hours, then returns a success message.
+
+---
+
+## Request
+
+### Method
+
+```
+GET
+```
+
+### URL
+
+```
+/users/logout
+```
+
+### Headers
+
+- `Authorization: Bearer <JWT_TOKEN>` (or use cookie `token=<JWT_TOKEN>`)
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+### Error Response
+
+**Status Code:** `401 Unauthorized`
+
+**Response Body:**
+
+```json
+{
+  "message": "Access denied. No token provided."
+}
+```

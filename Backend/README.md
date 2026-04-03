@@ -579,3 +579,234 @@ application/json
 - `email` is unique at database level.
 - Tokens are JWTs signed with `process.env.JWT_SECRET` and valid for 24 hours.
 - `status` defaults to `inactive` on registration.
+
+---
+
+## Captain Login Endpoint
+
+### Endpoint Details
+
+**Route:** `POST /captains/login`
+
+**Description:** Authenticate existing captain by validating credentials and returning a JWT token.
+
+---
+
+## Request
+
+### Method
+
+```
+POST
+```
+
+### URL
+
+```
+/captains/login
+```
+
+### Content-Type
+
+```
+application/json
+```
+
+### Request Body
+
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+### Request Parameters
+
+| Field      | Type   | Required | Validation         |
+| ---------- | ------ | -------- | ------------------ |
+| `email`    | String | Yes      | Valid email format |
+| `password` | String | Yes      | Minimum 6 chars    |
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "token": "JWT_TOKEN_HERE",
+  "captain": {
+    "_id": "captain_id",
+    "fullName": { "firstName": "John", "lastName": "Doe" },
+    "email": "john@example.com",
+    "vehicle": {
+      "color": "Blue",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "inactive"
+  }
+}
+```
+
+### Error Responses
+
+#### 1. Validation Error
+
+**Status Code:** `400 Bad Request`
+
+**Response Body:**
+
+```json
+{
+  "errors": [ ... ]
+}
+```
+
+#### 2. Authentication Error
+
+**Status Code:** `400 Bad Request`
+
+**Response Body:**
+
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+---
+
+## Captain Profile Endpoint
+
+### Endpoint Details
+
+**Route:** `GET /captains/profile`
+
+**Description:** Returns authenticated captain profile data. Requires bearer token or cookie.
+
+---
+
+## Request
+
+### Method
+
+```
+GET
+```
+
+### URL
+
+```
+/captains/profile
+```
+
+### Headers
+
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Cookie: token=<JWT_TOKEN>`
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "captain": {
+    "_id": "captain_id",
+    "fullName": { "firstName": "John", "lastName": "Doe" },
+    "email": "john@example.com",
+    "vehicle": {
+      "color": "Blue",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "active"
+  }
+}
+```
+
+### Error Response
+
+**Status Code:** `401 Unauthorized`
+
+**Response Body:**
+
+```json
+{
+  "message": "Access denied. No token provided."
+}
+```
+
+---
+
+## Captain Logout Endpoint
+
+### Endpoint Details
+
+**Route:** `GET /captains/logout`
+
+**Description:** Logs out captain by blacklisting token and clearing cookie.
+
+---
+
+## Request
+
+### Method
+
+```
+GET
+```
+
+### URL
+
+```
+/captains/logout
+```
+
+### Headers
+
+- `Authorization: Bearer <JWT_TOKEN>`
+- `Cookie: token=<JWT_TOKEN>`
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+### Error Response
+
+**Status Code:** `401 Unauthorized`
+
+**Response Body:**
+
+```json
+{
+  "message": "Access denied. No token provided."
+}
+```

@@ -449,3 +449,133 @@ GET
   "message": "Access denied. No token provided."
 }
 ```
+
+---
+
+## Captain Registration Endpoint
+
+### Endpoint Details
+
+**Route:** `POST /captains/register`
+
+**Description:** Register a new captain. Validates input fields, hashes the password, and stores captain details including the nested `vehicle` object.
+
+---
+
+## Request
+
+### Method
+
+```
+POST
+```
+
+### URL
+
+```
+/captains/register
+```
+
+### Content-Type
+
+```
+application/json
+```
+
+### Request Body
+
+```json
+{
+  "fullName": {
+    "firstName": "string",
+    "lastName": "string"
+  },
+  "email": "string",
+  "password": "string",
+  "vehicle": {
+    "color": "string",
+    "plate": "string",
+    "capacity": number,
+    "vehicleType": "car|motorcycle|auto rickshaw"
+  }
+}
+```
+
+### Request Parameters
+
+| Field                 | Type   | Required | Validation                                  |
+| --------------------- | ------ | -------- | ------------------------------------------- |
+| `fullName.firstName`  | String | Yes      | Minimum 3 characters                        |
+| `fullName.lastName`   | String | Yes      | Minimum 2 characters                        |
+| `email`               | String | Yes      | Valid email format, unique                  |
+| `password`            | String | Yes      | Minimum 6 characters                        |
+| `vehicle.color`       | String | Yes      | Minimum 3 characters                        |
+| `vehicle.plate`       | String | Yes      | Minimum 3 characters                        |
+| `vehicle.capacity`    | Number | Yes      | Integer >= 1                                |
+| `vehicle.vehicleType` | String | Yes      | One of `car`, `motorcycle`, `auto rickshaw` |
+
+---
+
+## Response
+
+### Success Response
+
+**Status Code:** `200 OK`
+
+**Response Body:**
+
+```json
+{
+  "token": "JWT_TOKEN_HERE",
+  "captain": {
+    "_id": "captain_id",
+    "fullName": {
+      "firstName": "John",
+      "lastName": "Doe"
+    },
+    "email": "john@example.com",
+    "vehicle": {
+      "color": "Blue",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    },
+    "status": "inactive"
+  }
+}
+```
+
+### Error Responses
+
+#### 1. Validation Error
+
+**Status Code:** `400 Bad Request`
+
+**Response Body:**
+
+```json
+{
+  "errors": [ ... ]
+}
+```
+
+#### 2. Duplicate Email Error
+
+**Status Code:** `400 Bad Request`
+
+**Response Body:**
+
+```json
+{
+  "message": "Captain already exists"
+}
+```
+
+---
+
+## Captain Notes
+
+- The captain password is hashed using bcrypt before saving.
+- `email` is unique at database level.
+- Tokens are JWTs signed with `process.env.JWT_SECRET` and valid for 24 hours.
+- `status` defaults to `inactive` on registration.

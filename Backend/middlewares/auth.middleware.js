@@ -42,10 +42,14 @@ module.exports.authCaptain = async (req, res, next) => {
 
   const isBlacklisted = await blacklistTokenModel.findOne({ token: token });
 
+  // if (isBlacklisted) {
+  //   return res
+  //     .status(401)
+  //     .json({ message: "Token is blacklisted. Please log in again." });
+  // }
+
   if (isBlacklisted) {
-    return res
-      .status(401)
-      .json({ message: "Token is blacklisted. Please log in again." });
+    return res.status(200).json({ message: "Already logged out" });
   }
 
   try {

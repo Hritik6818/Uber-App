@@ -1,26 +1,27 @@
 import { useState } from "react";
 import React from "react";
 import { Link } from "react-router-dom";
+import { CaptainDataContext } from "../context/CaptainContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const CaptainSignUp = () => {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userData, setUserData] = useState({});
 
-  const submitHandler = (e) => {
-    e.preventDefault();
+  const [vehiclePlate, setVehiclePlate] = useState("");
+  const [vehicleCapacity, setVehicleCapacity] = useState("");
+  const [vehicleColor, setVehicleColor] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
 
-    // setUserData({
-    //   username: {
-    //     firstName: firstName,
-    //     lastName: lastName,
-    //   },
-    //   email: email,
-    //   password: password,
-    // });
-    // console.log(userData);
+  const { captain, setCaptain } = React.useContext(CaptainDataContext);
+  const submitHandler = async (e) => {
+    e.preventDefault();
 
     const data = {
       email: email,
@@ -29,7 +30,26 @@ const CaptainSignUp = () => {
         firstName: firstName,
         lastName: lastName,
       },
+      vehicle: {
+        color: vehicleColor,
+        plate: vehiclePlate,
+        capacity: vehicleCapacity,
+        vehicleType: vehicleType,
+      },
     };
+
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/captains/register`,
+      data,
+    );
+
+    if (response.status === 201 || response.status === 200) {
+      const data = response.data;
+      setCaptain(data.captain);
+      localStorage.setItem("token", data.token);
+      alert("Registration successful! Please log in.");
+      navigate("/captain-home");
+    }
 
     setUserData(userData);
     console.log(data); // ✅ correct
@@ -38,6 +58,10 @@ const CaptainSignUp = () => {
     setPassword("");
     setFirstName("");
     setLastName("");
+    setVehicleColor("");
+    setVehiclePlate("");
+    setVehicleCapacity("");
+    setVehicleType("");
   };
 
   return (
@@ -90,8 +114,53 @@ const CaptainSignUp = () => {
             placeholder="password"
           />
 
+          <h3 className="text-lg font-medium mb-2">Vehicle Information</h3>
+
+          <div className="flex gap-2 mb-6">
+            <input
+              className="bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base"
+              type="text"
+              value={vehicleColor}
+              onChange={(e) => setVehicleColor(e.target.value)}
+              required
+              placeholder="Vehicle Color"
+            />
+
+            <input
+              className="bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base"
+              type="text"
+              value={vehiclePlate}
+              onChange={(e) => setVehiclePlate(e.target.value)}
+              required
+              placeholder="Vehicle Plate"
+            />
+          </div>
+
+          <div className="flex gap-2 mb-6">
+            <input
+              className="bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base"
+              type="number"
+              value={vehicleCapacity}
+              onChange={(e) => setVehicleCapacity(e.target.value)}
+              required
+              placeholder="Capacity"
+            />
+
+            <select
+              className="bg-[#eeeeee] w-1/2 rounded px-4 py-2 border text-lg placeholder:text-base"
+              value={vehicleType}
+              onChange={(e) => setVehicleType(e.target.value)}
+              required
+            >
+              <option value="">Select Vehicle Type</option>
+              <option value="car">Car</option>
+              <option value="auto">Auto</option>
+              <option value="moto">Moto</option>
+            </select>
+          </div>
+
           <button className="bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2  w-full text-lg placeholder:text-base">
-            Login
+            Create Account
           </button>
         </form>
 

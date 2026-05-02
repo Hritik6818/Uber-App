@@ -68,9 +68,27 @@ module.exports.getUserProfile = async (req, res, next) => {
   res.status(200).json({ user: req.user });
 };
 
-module.exports.logoutUser = async (req, res, next) => {
+// module.exports.logoutUser = async (req, res, next) => {
+//   res.clearCookie("token");
+//   const token = req.cookies.token || req.headers.authorization.split(" ")[1];
+//   await blacklistTokenModel.create({ token });
+//   res.status(200).json({ message: "Logged out successfully" });
+// };
+
+module.exports.logoutUser = async (req, res) => {
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    const exists = await blacklistTokenModel.findOne({ token });
+
+    if (!exists) {
+      await blacklistTokenModel.create({ token });
+    }
+  }
+
   res.clearCookie("token");
-  const token = req.cookies.token || req.headers.authorization.split(" ")[1];
-  await blacklistTokenModel.create({ token });
-  res.status(200).json({ message: "Logged out successfully" });
+
+  return res.status(200).json({
+    message: "Logged out successfully",
+  });
 };
